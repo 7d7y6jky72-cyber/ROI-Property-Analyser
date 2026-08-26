@@ -1,46 +1,27 @@
-# Property ROI Tracker v0.2.0
+# Property ROI Tracker v0.4.0
 
-A local-first installable web app for tracking Australian investment property valuations, debt, equity, rental cash flow and ROI.
+A local-first, mobile-friendly static web app. Open `index.html`, or publish all files to GitHub Pages. Data stays in the browser unless exported.
 
-## Included in v0.2.0
-- Portfolio dashboard: value, debt, equity, LVR, net cash flow and return on current equity.
-- Property register with purchase, valuation, loan, interest, rent and operating-expense inputs.
-- Valuation history.
-- Gross yield, net yield, annualised capital growth, cash-on-cash return and return on current equity.
-- Usable-equity estimate at 70%, 75% or 80% target LVR.
-- Simple investment score and Hold / Review / Potential Sell indication.
-- Scenario modelling for valuation, rent, interest rate and expenses.
-- JSON backup export/import.
-- Local browser storage and offline service worker.
+## ROE definition
 
-## Running it
-The app is a static PWA. Serve this folder from any simple HTTPS/static web host. For local desktop testing, a local HTTP server works as well.
+Return on current realizable equity = current annual return / net sale equity.
 
-Example with Python:
+- Net sale equity = current value − loan balance − estimated selling costs.
+- Current annual return = annual net cash flow before capital expenditure + annualised recent capital growth.
+- Selling costs include the entered agent percentage and fixed selling costs.
 
-    python3 -m http.server 8080
+The app also displays the cash-only ROE separately, so the user can see the result without assumed capital growth.
 
-Then open http://localhost:8080.
+## Strategy and future value
 
-On iPhone, open the hosted HTTPS version in Safari and choose **Share > Add to Home Screen**.
+Each property includes conservative, base and optimistic growth scenarios; projected value, rent, expenses, debt, net sale equity, cash flow and ROE; and a configurable 1–30 year forecast. A proposed sale year can model estimated tax, net cash released and the future value of redeploying that cash. All assumptions are editable and separated from current results.
 
-## Data
-Property information is stored in the browser's localStorage. Use Export backup regularly. Clearing browser/site data can erase local records.
+An optional high-level development feasibility module calculates projected profit, margin on development cost and annualised cash return from total end value, total development costs, equity and duration.
 
-## Calculation notes
-- Annual rent = weekly rent × 52.
-- Interest = current loan balance × entered annual interest rate.
-- Net cash flow = rent − annual operating expenses − interest.
-- Net yield = (rent − operating expenses) ÷ current value.
-- Capital growth p.a. is annualised from purchase price/date to current valuation/date.
-- Return on current equity = (net cash flow + annualised capital-growth amount) ÷ current equity.
-- Principal repayments and tax effects are intentionally excluded in v0.2.0.
+## Market prospects
 
-This tool is for portfolio analysis and record keeping, not financial, tax or valuation advice.
+The app does not claim to provide live data. Users enter dated indicators from open sources, and the app creates a transparent directional summary. Source links are included for ABS, RBA, state planning portals and SQM Research. Verify figures before making decisions.
 
+## Upgrade compatibility
 
-## v0.2.0 expense tracking
-
-Properties can now store a detailed expense schedule instead of a single annual estimate. Built-in categories include council rates, water charges, strata/body corporate, building insurance, landlord insurance, property management, letting/lease renewal fees, repairs and maintenance, land tax, compliance/safety, owner-paid utilities, accounting/legal costs, renovations/improvements and Other.
-
-Each expense can be entered as weekly, monthly, quarterly, half-yearly, annual or one-off, and classified as either an operating expense or capital expenditure. The app annualises recurring costs automatically. Operating expenses feed net yield and net cash flow; capital expenditure is reported separately as cash after capex. Existing v0.1.0 annual-expense data is retained as a legacy operating expense when editing an older property.
+The app reads the earlier `property-roi-tracker-v1` local-storage key and migrates common field names and legacy expense records into the v0.3 format. Export a backup before replacing an older deployment.
