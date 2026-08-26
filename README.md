@@ -1,4 +1,4 @@
-# Property ROI Tracker v0.6.0
+# Property & Share Investment Tracker v0.7.0
 
 A local-first, mobile-friendly static web app. Open `index.html`, or publish all files to GitHub Pages. Data stays in the browser unless exported.
 
@@ -27,6 +27,14 @@ Expenses include payee, amount, frequency, next due date, reminder lead time, la
 Enter a suburb benchmark value at the start and end of a historical period plus the period in years. The app calculates CAGR as `(end / start)^(1 / years) - 1`. Forecasts can use that historical CAGR or a manually entered suburb forecast rate, compounded for a manually selected 1–30 year period.
 
 Purchase-basis ROE is shown as one year of gross rental income divided by purchase price plus acquisition costs. Weekly rent is annualised as `(weekly rent / 7) × 365`. It is displayed separately from current-equity ROE because the two measures answer different questions.
+
+## Share portfolio
+
+The Shares tab tracks securities, exchanges, currencies, buy/sell allotments, quantities, purchase prices, brokerage, dividends, weighted-average remaining cost basis, current value, realised and unrealised gains, and total return. Manual price history produces an SVG chart.
+
+An optional Alpha Vantage API key enables `TIME_SERIES_DAILY` synchronisation for recent closing prices. The key stays in browser storage and is sent only to Alpha Vantage when Sync is pressed. Provider limits and delays apply; manual prices remain the fallback.
+
+Decision support combines the user's 1–5 assessments of business quality, valuation, growth outlook and dividend quality with price trends, target price and review/stop price. Outputs are Accumulate candidate, Hold, Review or Consider selling, with reasons. They are not personal financial advice.
 
 ## Market prospects
 

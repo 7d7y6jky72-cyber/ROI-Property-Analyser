@@ -9,10 +9,11 @@ const uid=()=>crypto.randomUUID?.()||`${Date.now()}-${Math.random()}`;
 const frequencies={weekly:52,fortnightly:26,monthly:12,quarterly:4,'half-yearly':2,annual:1,'one-off':0};
 let state=load(); let route={name:'portfolio'};
 
-function blank(){return {version:3,properties:[]}}
+function blank(){return {version:7,properties:[],shares:[],marketData:{provider:'alphavantage',apiKey:''}}}
+function migrateShare(s){return {id:s.id||uid(),ticker:(s.ticker||'').toUpperCase(),name:s.name||'',exchange:s.exchange||'ASX',currency:s.currency||'AUD',currentPrice:num(s.currentPrice),priceUpdated:s.priceUpdated||'',targetPrice:num(s.targetPrice),stopPrice:num(s.stopPrice),qualityScore:num(s.qualityScore||3),valueScore:num(s.valueScore||3),outlookScore:num(s.outlookScore||3),dividendScore:num(s.dividendScore||3),thesis:s.thesis||'',transactions:(s.transactions||[]).map(t=>({id:t.id||uid(),type:t.type||'buy',date:t.date||'',quantity:num(t.quantity),price:num(t.price),fees:num(t.fees),amount:num(t.amount),notes:t.notes||''})),priceHistory:(s.priceHistory||[]).map(h=>({date:h.date,close:num(h.close)})).filter(h=>h.date&&h.close)}}
 function migrate(x){
   const list=Array.isArray(x)?x:(x?.properties||[]);
-  return {version:3,properties:list.map(p=>({
+  return {version:7,properties:list.map(p=>({
     id:p.id||uid(),address:p.address||p.name||'',suburb:p.suburb||'',city:p.city||'',state:p.state||'',postcode:p.postcode||'',
     purchaseDate:p.purchaseDate||'',purchasePrice:num(p.purchasePrice),acquisitionCosts:num(p.acquisitionCosts||p.purchaseCosts),
     currentValue:num(p.currentValue||p.value),loanBalance:num(p.loanBalance||p.loan),interestRate:num(p.interestRate),annualPrincipal:num(p.annualPrincipal),
@@ -21,7 +22,7 @@ function migrate(x){
     expenses:(p.expenses||[]).map(e=>({id:e.id||uid(),name:e.name||e.category||'Expense',payee:e.payee||'',amount:num(e.amount),frequency:e.frequency||'annual',type:e.type||'operating',nextDueDate:e.nextDueDate||'',reminderDays:num(e.reminderDays??14),lastPaidDate:e.lastPaidDate||'',paid:!!e.paid,notes:e.notes||''})),
     valuations:p.valuations||[],prospects:{priceGrowth:num(p.prospects?.priceGrowth),rentGrowth:num(p.prospects?.rentGrowth),vacancyRate:num(p.prospects?.vacancyRate),populationGrowth:num(p.prospects?.populationGrowth),supply:p.prospects?.supply||'balanced',infrastructure:p.prospects?.infrastructure||'neutral',sourceDate:p.prospects?.sourceDate||'',notes:p.prospects?.notes||''},
     strategy:{growthConservative:num(p.strategy?.growthConservative||2),growthBase:num(p.strategy?.growthBase||p.prospects?.priceGrowth||5),growthOptimistic:num(p.strategy?.growthOptimistic||7),growthMethod:p.strategy?.growthMethod||'manual',suburbHistoryStart:num(p.strategy?.suburbHistoryStart),suburbHistoryEnd:num(p.strategy?.suburbHistoryEnd),suburbHistoryYears:num(p.strategy?.suburbHistoryYears||10),rentGrowth:num(p.strategy?.rentGrowth||p.prospects?.rentGrowth||3),expenseGrowth:num(p.strategy?.expenseGrowth||3),interestRate:num(p.strategy?.interestRate||p.interestRate),annualDebtReduction:num(p.strategy?.annualDebtReduction||p.annualPrincipal),forecastYears:num(p.strategy?.forecastYears||10),sellYear:num(p.strategy?.sellYear||0),cgtRate:num(p.strategy?.cgtRate),redeployReturn:num(p.strategy?.redeployReturn||6),saleValueHaircut:num(p.strategy?.saleValueHaircut),developmentEnabled:!!p.strategy?.developmentEnabled,developmentMonths:num(p.strategy?.developmentMonths||24),developmentEndValue:num(p.strategy?.developmentEndValue),developmentCosts:num(p.strategy?.developmentCosts),developmentEquity:num(p.strategy?.developmentEquity)}
-  }))};
+  })),shares:(x?.shares||[]).map(migrateShare),marketData:{provider:'alphavantage',apiKey:x?.marketData?.apiKey||''}};
 }
 function load(){try{const v=localStorage.getItem(KEY);if(v)return migrate(JSON.parse(v));const old=localStorage.getItem(LEGACY);if(old){const m=migrate(JSON.parse(old));localStorage.setItem(KEY,JSON.stringify(m));return m}}catch(e){}return blank()}
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
