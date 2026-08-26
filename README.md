@@ -1,4 +1,4 @@
-# Property & Share Investment Tracker v0.7.0
+# Property & Share Investment Tracker v0.8.0
 
 A local-first, mobile-friendly static web app. Open `index.html`, or publish all files to GitHub Pages. Data stays in the browser unless exported.
 
@@ -35,6 +35,12 @@ The Shares tab tracks securities, exchanges, currencies, buy/sell allotments, qu
 An optional Alpha Vantage API key enables `TIME_SERIES_DAILY` synchronisation for recent closing prices. The key stays in browser storage and is sent only to Alpha Vantage when Sync is pressed. Provider limits and delays apply; manual prices remain the fallback.
 
 Decision support combines the user's 1–5 assessments of business quality, valuation, growth outlook and dividend quality with price trends, target price and review/stop price. Outputs are Accumulate candidate, Hold, Review or Consider selling, with reasons. They are not personal financial advice.
+
+## Reminder separation
+
+Expense reminders do not feed operating expenses or investment calculations by default. Each scheduled payment has an explicit `Include in cash-flow and ROI calculations` setting. Only items set to Yes affect operating costs, cash flow, yield or ROE. Existing records without that explicit setting migrate as reminder-only.
+
+Every property also displays: `loan interest + included operating expenses + principal repayments = annual cash outflow`. Capital expenditure remains separate.
 
 ## Market prospects
 

@@ -19,7 +19,7 @@ function migrate(x){
     currentValue:num(p.currentValue||p.value),loanBalance:num(p.loanBalance||p.loan),interestRate:num(p.interestRate),annualPrincipal:num(p.annualPrincipal),
     rentAmount:num(p.rentAmount||p.weeklyRent),rentFrequency:p.rentFrequency||(p.weeklyRent?'weekly':'weekly'),vacancyWeeks:num(p.vacancyWeeks),
     sellingAgentPct:num(p.sellingAgentPct||2.2),sellingFixedCosts:num(p.sellingFixedCosts||5000),
-    expenses:(p.expenses||[]).map(e=>({id:e.id||uid(),name:e.name||e.category||'Expense',payee:e.payee||'',amount:num(e.amount),frequency:e.frequency||'annual',type:e.type||'operating',nextDueDate:e.nextDueDate||'',reminderDays:num(e.reminderDays??14),lastPaidDate:e.lastPaidDate||'',paid:!!e.paid,notes:e.notes||''})),
+    expenses:(p.expenses||[]).map(e=>({id:e.id||uid(),name:e.name||e.category||'Expense',payee:e.payee||'',amount:num(e.amount),frequency:e.frequency||'annual',type:e.type||'operating',includeInCalculations:e.includeInCalculations===true,nextDueDate:e.nextDueDate||'',reminderDays:num(e.reminderDays??14),lastPaidDate:e.lastPaidDate||'',paid:!!e.paid,notes:e.notes||''})),
     valuations:p.valuations||[],prospects:{priceGrowth:num(p.prospects?.priceGrowth),rentGrowth:num(p.prospects?.rentGrowth),vacancyRate:num(p.prospects?.vacancyRate),populationGrowth:num(p.prospects?.populationGrowth),supply:p.prospects?.supply||'balanced',infrastructure:p.prospects?.infrastructure||'neutral',sourceDate:p.prospects?.sourceDate||'',notes:p.prospects?.notes||''},
     strategy:{growthConservative:num(p.strategy?.growthConservative||2),growthBase:num(p.strategy?.growthBase||p.prospects?.priceGrowth||5),growthOptimistic:num(p.strategy?.growthOptimistic||7),growthMethod:p.strategy?.growthMethod||'manual',suburbHistoryStart:num(p.strategy?.suburbHistoryStart),suburbHistoryEnd:num(p.strategy?.suburbHistoryEnd),suburbHistoryYears:num(p.strategy?.suburbHistoryYears||10),rentGrowth:num(p.strategy?.rentGrowth||p.prospects?.rentGrowth||3),expenseGrowth:num(p.strategy?.expenseGrowth||3),interestRate:num(p.strategy?.interestRate||p.interestRate),annualDebtReduction:num(p.strategy?.annualDebtReduction||p.annualPrincipal),forecastYears:num(p.strategy?.forecastYears||10),sellYear:num(p.strategy?.sellYear||0),cgtRate:num(p.strategy?.cgtRate),redeployReturn:num(p.strategy?.redeployReturn||6),saleValueHaircut:num(p.strategy?.saleValueHaircut),developmentEnabled:!!p.strategy?.developmentEnabled,developmentMonths:num(p.strategy?.developmentMonths||24),developmentEndValue:num(p.strategy?.developmentEndValue),developmentCosts:num(p.strategy?.developmentCosts),developmentEquity:num(p.strategy?.developmentEquity)}
   })),shares:(x?.shares||[]).map(migrateShare),marketData:{provider:'alphavantage',apiKey:x?.marketData?.apiKey||''}};
@@ -31,8 +31,8 @@ function calc(p){
   const grossRent=num(p.rentAmount)*(frequencies[p.rentFrequency]??52);
   const annualIncome=p.rentFrequency==='weekly'?num(p.rentAmount)/7*365:grossRent;
   const rent=grossRent*(1-Math.min(52,num(p.vacancyWeeks))/52);
-  const op=p.expenses.filter(e=>e.type!=='capital').reduce((a,e)=>a+annualExpense(e),0);
-  const capex=p.expenses.filter(e=>e.type==='capital').reduce((a,e)=>a+annualExpense(e),0);
+  const op=p.expenses.filter(e=>e.includeInCalculations&&e.type!=='capital').reduce((a,e)=>a+annualExpense(e),0);
+  const capex=p.expenses.filter(e=>e.includeInCalculations&&e.type==='capital').reduce((a,e)=>a+annualExpense(e),0);
   const interest=num(p.loanBalance)*num(p.interestRate)/100;
   const cash=rent-op-interest-num(p.annualPrincipal);
   const growth=recentGrowth(p);
