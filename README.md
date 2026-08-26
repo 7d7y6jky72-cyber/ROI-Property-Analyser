@@ -1,4 +1,4 @@
-# Property ROI Tracker v0.4.0
+# Property ROI Tracker v0.5.0
 
 A local-first, mobile-friendly static web app. Open `index.html`, or publish all files to GitHub Pages. Data stays in the browser unless exported.
 
@@ -17,6 +17,10 @@ The app also displays the cash-only ROE separately, so the user can see the resu
 Each property includes conservative, base and optimistic growth scenarios; projected value, rent, expenses, debt, net sale equity, cash flow and ROE; and a configurable 1–30 year forecast. A proposed sale year can model estimated tax, net cash released and the future value of redeploying that cash. All assumptions are editable and separated from current results.
 
 An optional high-level development feasibility module calculates projected profit, margin on development cost and annualised cash return from total end value, total development costs, equity and duration.
+
+## Expense schedule and reminders
+
+Expenses include payee, amount, frequency, next due date, reminder lead time, last paid date and notes. The portfolio shows upcoming or overdue reminders when the app opens. Marking a recurring expense paid records today and advances its next due date; one-off expenses become paid. Reminders are in-app and appear when the tracker is opened.
 
 ## Market prospects
 

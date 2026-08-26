@@ -1,0 +1,2 @@
+.portfolio-reminder{width:100%;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;margin:0 0 14px;padding:15px;text-align:left;color:var(--ink);background:#39251d;border:1px solid #8a4f34;border-radius:17px;cursor:pointer}
+.portfolio-reminder>span{color:var(--amber);font-size:1.3rem}.portfolio-reminder b{display:block}.portfolio-reminder small{display:block;color:#f2c5ae;margin-top:4px;line-height:1.5}.portfolio-reminder strong{color:var(--amber)}
