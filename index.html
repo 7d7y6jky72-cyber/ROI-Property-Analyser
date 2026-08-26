@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Property ROI Tracker</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <style>
+    :root{
+      --bg:#f4f7fb;--panel:#fff;--ink:#162033;--muted:#667085;--line:#e4e7ec;
+      --accent:#2563eb;--accent2:#0f766e;--good:#137333;--warn:#b54708;--bad:#b42318;
+      --shadow:0 8px 24px rgba(16,24,40,.08);--radius:18px;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+    button,input,select{font:inherit} button{cursor:pointer}
+    header{position:sticky;top:0;z-index:20;background:#0f172a;color:#fff;padding:calc(14px + env(safe-area-inset-top)) 16px 14px;box-shadow:0 3px 14px rgba(0,0,0,.12)}
+    .header-row{max-width:1280px;margin:auto;display:flex;gap:12px;align-items:center;justify-content:space-between}.brand{font-size:20px;font-weight:800;letter-spacing:.1px}.version{font-size:12px;opacity:.72}
+    main{max-width:1280px;margin:auto;padding:16px 16px calc(32px + env(safe-area-inset-bottom))}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:10px 13px;font-weight:700}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.danger{color:var(--bad)}
+    .cards{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:16px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow)}.stat .k{font-size:12px;color:var(--muted);margin-bottom:6px}.stat .v{font-size:20px;font-weight:800;line-height:1.15}.stat .s{font-size:11px;color:var(--muted);margin-top:5px}
+    .section{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}.section-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}.section-head h2{margin:0;font-size:17px}.section-body{padding:14px 16px}
+    .properties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.property{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}.property-top{display:flex;justify-content:space-between;gap:10px}.property-name{font-weight:800;font-size:17px}.property-meta{font-size:12px;color:var(--muted);margin-top:2px}.pill{padding:5px 8px;border-radius:999px;font-size:11px;font-weight:800;background:#eef2ff;color:#3730a3;white-space:nowrap}.pill.good{background:#ecfdf3;color:var(--good)}.pill.warn{background:#fff7ed;color:var(--warn)}.pill.bad{background:#fef3f2;color:var(--bad)}
+    .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}.metric{background:#f8fafc;border-radius:12px;padding:9px}.metric .k{font-size:11px;color:var(--muted)}.metric .v{font-size:14px;font-weight:800;margin-top:3px}.actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.actions button{padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:700;font-size:12px}
+    .empty{text-align:center;color:var(--muted);padding:30px 10px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;font-weight:700;color:#344054}.field input,.field select{border:1px solid #d0d5dd;border-radius:10px;padding:10px;background:#fff;color:var(--ink);min-width:0}.field small{font-size:11px;color:var(--muted)}
+    dialog{width:min(760px,calc(100vw - 24px));max-height:90vh;border:0;border-radius:20px;padding:0;box-shadow:0 24px 70px rgba(0,0,0,.25)}dialog::backdrop{background:rgba(15,23,42,.55)}.modal-head{padding:15px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modal-head h3{margin:0}.modal-body{padding:16px;overflow:auto;max-height:70vh}.modal-foot{padding:13px 16px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}.close{border:0;background:transparent;font-size:24px;color:var(--muted)}
+    .scenario-result{margin-top:14px;background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.scenario-result div{font-size:12px;color:var(--muted)}.scenario-result b{display:block;color:var(--ink);font-size:16px;margin-top:3px}
+    .history{width:100%;border-collapse:collapse;font-size:13px}.history th,.history td{text-align:left;padding:9px;border-bottom:1px solid var(--line)}.history th{color:var(--muted);font-size:11px}.note{background:#eff6ff;color:#1e3a8a;border-radius:12px;padding:10px;font-size:12px;margin-bottom:12px}.expense-box{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px}.expense-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.expense-row{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}.expense-row button{height:42px}.expense-summary{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}@media(max-width:620px){.expense-row{grid-template-columns:1fr 1fr}.expense-row .wide{grid-column:1/-1}.expense-row button{width:100%}}
+    @media(max-width:980px){.cards{grid-template-columns:repeat(3,1fr)}.properties{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(4,1fr)}}
+    @media(max-width:620px){main{padding-left:10px;padding-right:10px}.cards{grid-template-columns:repeat(2,1fr)}.stat .v{font-size:17px}.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.header-row{align-items:flex-start}.brand{font-size:18px}.scenario-result{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<header><div class="header-row"><div><div class="brand">Property ROI Tracker</div><div class="version">v0.2.0 · Mobile-first portfolio dashboard</div></div><div id="saveState" class="version">Saved locally</div></div></header>
+<main>
+  <div class="toolbar">
+    <button class="btn primary" id="addBtn">+ Add property</button>
+    <button class="btn" id="exportBtn">Export backup</button>
+    <button class="btn" id="importBtn">Import backup</button>
+    <input id="importFile" type="file" accept="application/json" hidden>
+  </div>
+  <div class="cards" id="portfolioCards"></div>
+
+  <section class="section">
+    <div class="section-head"><h2>Portfolio</h2><span id="propertyCount" class="version"></span></div>
+    <div class="section-body"><div class="properties" id="propertyList"></div></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>How returns are calculated</h2></div>
+    <div class="section-body">
+      <div class="note"><b>Return on current equity</b> = (annual net cash flow + annualised capital growth) ÷ current equity. This highlights how effectively today's tied-up equity is working.</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.55">Capital growth is annualised from purchase price/date to current valuation. Net cash flow includes rent less operating expenses and interest, but excludes principal repayments so financing structure can be compared consistently. This version is an analysis tool, not tax or financial advice.</div>
+    </div>
+  </section>
+</main>
+
+<dialog id="propertyDialog">
+  <form method="dialog" id="propertyForm">
+    <div class="modal-head"><h3 id="formTitle">Add property</h3><button class="close" value="cancel" aria-label="Close">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="propId">
+      <div class="grid">
+        <div class="field"><label>Property name / address</label><input id="name" required placeholder="e.g. 12 Example St, Toowoomba"></div>
+        <div class="field"><label>State</label><select id="state"><option>VIC</option><option>NSW</option><option>QLD</option><option>TAS</option><option>SA</option><option>WA</option><option>ACT</option><option>NT</option></select></div>
+        <div class="field"><label>Purchase date</label><input id="purchaseDate" type="date" required></div>
+        <div class="field"><label>Purchase price (A$)</label><input id="purchasePrice" type="number" min="0" step="1000" required></div>
+        <div class="field"><label>Acquisition costs (A$)</label><input id="acquisitionCosts" type="number" min="0" step="100" value="0"><small>Stamp duty, legal, buyers agent etc.</small></div>
+        <div class="field"><label>Current valuation (A$)</label><input id="currentValue" type="number" min="0" step="1000" required></div>
+        <div class="field"><label>Valuation date</label><input id="valuationDate" type="date" required></div>
+        <div class="field"><label>Loan balance (A$)</label><input id="loanBalance" type="number" min="0" step="1000" value="0"></div>
+        <div class="field"><label>Interest rate (%)</label><input id="interestRate" type="number" min="0" step="0.01" value="6"></div>
+        <div class="field"><label>Weekly rent (A$)</label><input id="weeklyRent" type="number" min="0" step="5" value="0"></div>
+      </div>
+      <div class="expense-box">
+        <div class="expense-head"><div><b>Expense schedule</b><div style="font-size:11px;color:var(--muted);margin-top:2px">Add recurring costs and capital expenditure. Recurring items feed net yield and cash flow; capex is shown separately.</div></div><button class="btn" type="button" id="addExpenseBtn">+ Add expense</button></div>
+        <div id="expenseRows"></div>
+        <div class="expense-summary"><span>Annual operating: <b id="expenseOperatingTotal">$0</b></span><span>Annualised capex: <b id="expenseCapexTotal">$0</b></span></div>
+      </div>
+      <div class="grid" style="margin-top:12px">
+        <div class="field"><label>Target usable LVR (%)</label><select id="usableLvr"><option value="70">70%</option><option value="75">75%</option><option value="80" selected>80%</option></select></div>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn" value="cancel">Cancel</button><button class="btn primary" id="saveProperty" value="default">Save property</button></div>
+  </form>
+</dialog>
+
+<dialog id="detailDialog">
+  <div class="modal-head"><h3 id="detailTitle">Property detail</h3><button class="close" onclick="detailDialog.close()">×</button></div>
+  <div class="modal-body" id="detailBody"></div>
+  <div class="modal-foot"><button class="btn" onclick="detailDialog.close()">Close</button></div>
+</dialog>
+
+<dialog id="scenarioDialog">
+  <div class="modal-head"><h3>Scenario analysis</h3><button class="close" onclick="scenarioDialog.close()">×</button></div>
+  <div class="modal-body">
+    <input type="hidden" id="scenarioId">
+    <div class="grid">
+      <div class="field"><label>Scenario valuation (A$)</label><input id="scValue" type="number" step="1000"></div>
+      <div class="field"><label>Weekly rent (A$)</label><input id="scRent" type="number" step="5"></div>
+      <div class="field"><label>Interest rate (%)</label><input id="scRate" type="number" step="0.01"></div>
+      <div class="field"><label>Annual operating expenses (A$)</label><input id="scExpenses" type="number" step="100"></div>
+    </div>
+    <div class="scenario-result" id="scenarioResult"></div>
+  </div>
+  <div class="modal-foot"><button class="btn" onclick="scenarioDialog.close()">Close</button></div>
+</dialog>
+
+<script>
+const STORAGE='property-roi-tracker-v0.1.0';
+let data=load();
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD',maximumFractionDigits:0}).format(Number(n||0));
+const pct=n=>`${Number(n||0).toFixed(1)}%`;
+const today=()=>new Date().toISOString().slice(0,10);
+function load(){try{return JSON.parse(localStorage.getItem(STORAGE))||{properties:[]}}catch{return {properties:[]}}}
+function save(){localStorage.setItem(STORAGE,JSON.stringify(data));$('saveState').textContent='Saved locally';render()}
+function yearsBetween(a,b){const ms=new Date(b)-new Date(a);return Math.max(ms/(365.25*86400000),0.01)}
+const FREQ={weekly:52,monthly:12,quarterly:4,halfYearly:2,annual:1,oneOff:1};
+function annualiseExpense(e){return Number(e.amount||0)*(FREQ[e.frequency]||1)}
+function annualOperating(p){if(Array.isArray(p.expenses)&&p.expenses.length)return p.expenses.filter(e=>e.type!=='capex').reduce((a,e)=>a+annualiseExpense(e),0);return Number(p.annualExpenses||0)}
+function annualCapex(p){return Array.isArray(p.expenses)?p.expenses.filter(e=>e.type==='capex').reduce((a,e)=>a+annualiseExpense(e),0):0}
+function expenseCategoryOptions(selected='Council rates'){const cats=['Council rates','Water charges','Strata / body corporate','Building insurance','Landlord insurance','Property management','Letting / lease renewal','Repairs & maintenance','Land tax','Compliance / safety','Owner-paid utilities','Accounting / legal','Renovation / improvement','Other'];return cats.map(x=>`<option ${x===selected?'selected':''}>${x}</option>`).join('')}
+function calc(p,override={}){
+ const v=Number(override.currentValue ?? p.currentValue ?? 0), loan=Number(p.loanBalance||0), rate=Number(override.interestRate ?? p.interestRate ?? 0)/100;
+ const rent=Number(override.weeklyRent ?? p.weeklyRent ?? 0)*52, expenses=Number(override.annualExpenses ?? annualOperating(p)), capex=annualCapex(p), interest=loan*rate;
+ const equity=v-loan, net=rent-expenses-interest, grossYield=v?rent/v*100:0, netYield=v?(rent-expenses)/v*100:0, lvr=v?loan/v*100:0;
+ const yrs=yearsBetween(p.purchaseDate,p.valuationDate||today()); const growth=Math.pow(v/Math.max(Number(p.purchasePrice||1),1),1/yrs)-1; const annualGrowth=v*growth;
+ const roe=equity?(net+annualGrowth)/equity*100:0; const coc=(Number(p.purchasePrice||0)+Number(p.acquisitionCosts||0)-loan)>0?net/(Number(p.purchasePrice||0)+Number(p.acquisitionCosts||0)-loan)*100:0;
+ const usable=Math.max(0,v*(Number(p.usableLvr||80)/100)-loan);
+ return {v,loan,equity,net,rent,expenses,capex,afterCapex:net-capex,interest,grossYield,netYield,lvr,growth:growth*100,annualGrowth,roe,coc,usable};
+}
+function score(p,c){let s=50; s+=Math.max(-15,Math.min(15,c.roe)); s+=Math.max(-10,Math.min(10,c.net/2000)); s+=Math.max(-10,Math.min(10,(70-c.lvr)/2)); s+=Math.max(-10,Math.min(10,c.growth)); return Math.max(0,Math.min(100,Math.round(s)))}
+function labelForScore(s){return s>=75?['Hold / Strong','good']:s>=55?['Hold / Review','']:s>=40?['Review','warn']:['Potential Sell / Fix','bad']}
+function render(){
+ const cs=data.properties.map(p=>({p,c:calc(p)})); const sum=cs.reduce((a,x)=>{a.value+=x.c.v;a.loan+=x.c.loan;a.equity+=x.c.equity;a.rent+=x.c.rent;a.net+=x.c.net;a.totalRet+=x.c.net+x.c.annualGrowth;return a},{value:0,loan:0,equity:0,rent:0,net:0,totalRet:0});
+ const plvr=sum.value?sum.loan/sum.value*100:0, proe=sum.equity?sum.totalRet/sum.equity*100:0;
+ const cards=[['Portfolio value',money(sum.value),'Current valuations'],['Debt',money(sum.loan),'Outstanding loan balances'],['Equity',money(sum.equity),'Value less debt'],['Portfolio LVR',pct(plvr),'Debt ÷ value'],['Annual net cash flow',money(sum.net),'After operating costs + interest'],['Return on equity',pct(proe),'Cash flow + annualised growth']];
+ $('portfolioCards').innerHTML=cards.map(x=>`<div class="stat"><div class="k">${x[0]}</div><div class="v">${x[1]}</div><div class="s">${x[2]}</div></div>`).join('');
+ $('propertyCount').textContent=`${data.properties.length} propert${data.properties.length===1?'y':'ies'}`;
+ $('propertyList').innerHTML=data.properties.length?data.properties.map(p=>{const c=calc(p),s=score(p,c),[lab,cl]=labelForScore(s);return `<article class="property"><div class="property-top"><div><div class="property-name">${esc(p.name)}</div><div class="property-meta">${p.state} · Valued ${p.valuationDate}</div></div><span class="pill ${cl}">${lab} · ${s}/100</span></div><div class="metrics"><div class="metric"><div class="k">Value</div><div class="v">${money(c.v)}</div></div><div class="metric"><div class="k">Equity</div><div class="v">${money(c.equity)}</div></div><div class="metric"><div class="k">Net cash flow</div><div class="v">${money(c.net)}</div></div><div class="metric"><div class="k">ROE</div><div class="v">${pct(c.roe)}</div></div><div class="metric"><div class="k">LVR</div><div class="v">${pct(c.lvr)}</div></div><div class="metric"><div class="k">Net yield</div><div class="v">${pct(c.netYield)}</div></div><div class="metric"><div class="k">Capital growth p.a.</div><div class="v">${pct(c.growth)}</div></div><div class="metric"><div class="k">Usable equity</div><div class="v">${money(c.usable)}</div></div><div class="metric"><div class="k">Operating expenses</div><div class="v">${money(c.expenses)}</div></div><div class="metric"><div class="k">Cash after capex</div><div class="v">${money(c.afterCapex)}</div></div></div><div class="actions"><button onclick="showDetail('${p.id}')">Details</button><button onclick="editProperty('${p.id}')">Edit</button><button onclick="scenario('${p.id}')">Scenario</button><button onclick="addValuation('${p.id}')">Add valuation</button><button class="danger" onclick="removeProperty('${p.id}')">Delete</button></div></article>`}).join(''):`<div class="empty">No properties yet. Add your first property to start tracking valuation, equity and ROI.</div>`;
+}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function openForm(p=null){$('propertyForm').reset();$('propId').value=p?.id||'';$('formTitle').textContent=p?'Edit property':'Add property'; const vals={name:p?.name||'',state:p?.state||'VIC',purchaseDate:p?.purchaseDate||today(),purchasePrice:p?.purchasePrice||'',acquisitionCosts:p?.acquisitionCosts||0,currentValue:p?.currentValue||'',valuationDate:p?.valuationDate||today(),loanBalance:p?.loanBalance||0,interestRate:p?.interestRate??6,weeklyRent:p?.weeklyRent||0,usableLvr:p?.usableLvr||80}; Object.entries(vals).forEach(([k,v])=>$(k).value=v);$('expenseRows').innerHTML='';const ex=(p?.expenses&&p.expenses.length)?p.expenses:(p?.annualExpenses?[{category:'Other',amount:p.annualExpenses,frequency:'annual',type:'operating'}]:[]);ex.forEach(addExpenseRow);updateExpenseTotals();propertyDialog.showModal()}
+function addExpenseRow(e={category:'Council rates',amount:'',frequency:'annual',type:'operating'}){const row=document.createElement('div');row.className='expense-row';row.innerHTML=`<div class="field wide"><label>Expense</label><select class="exp-category">${expenseCategoryOptions(e.category)}</select></div><div class="field"><label>Amount (A$)</label><input class="exp-amount" type="number" min="0" step="1" value="${Number(e.amount||0)||''}"></div><div class="field"><label>Frequency</label><select class="exp-frequency"><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="halfYearly">Half-yearly</option><option value="annual">Annual</option><option value="oneOff">One-off</option></select></div><div class="field"><label>Type</label><select class="exp-type"><option value="operating">Operating</option><option value="capex">Capital expenditure</option></select></div><button type="button" class="btn danger">Remove</button>`;row.querySelector('.exp-frequency').value=e.frequency||'annual';row.querySelector('.exp-type').value=e.type||'operating';row.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',updateExpenseTotals));row.querySelector('button').onclick=()=>{row.remove();updateExpenseTotals()};$('expenseRows').appendChild(row);updateExpenseTotals()}
+function readExpenses(){return [...$('expenseRows').querySelectorAll('.expense-row')].map(r=>({category:r.querySelector('.exp-category').value,amount:+r.querySelector('.exp-amount').value||0,frequency:r.querySelector('.exp-frequency').value,type:r.querySelector('.exp-type').value})).filter(e=>e.amount>0)}
+function updateExpenseTotals(){const ex=readExpenses();const op=ex.filter(e=>e.type==='operating').reduce((a,e)=>a+annualiseExpense(e),0),cap=ex.filter(e=>e.type==='capex').reduce((a,e)=>a+annualiseExpense(e),0);$('expenseOperatingTotal').textContent=money(op);$('expenseCapexTotal').textContent=money(cap)}
+$('addExpenseBtn').onclick=()=>addExpenseRow();
+$('addBtn').onclick=()=>openForm();
+$('propertyForm').addEventListener('submit',e=>{e.preventDefault();const id=$('propId').value||crypto.randomUUID();const existing=data.properties.find(p=>p.id===id);const p={id,name:$('name').value.trim(),state:$('state').value,purchaseDate:$('purchaseDate').value,purchasePrice:+$('purchasePrice').value,acquisitionCosts:+$('acquisitionCosts').value,currentValue:+$('currentValue').value,valuationDate:$('valuationDate').value,loanBalance:+$('loanBalance').value,interestRate:+$('interestRate').value,weeklyRent:+$('weeklyRent').value,expenses:readExpenses(),annualExpenses:0,usableLvr:+$('usableLvr').value,valuations:existing?.valuations||[]};if(existing){Object.assign(existing,p)}else{p.valuations.push({date:p.valuationDate,value:p.currentValue});data.properties.push(p)}save();propertyDialog.close()});
+function editProperty(id){openForm(data.properties.find(p=>p.id===id))}
+function removeProperty(id){if(confirm('Delete this property and its valuation history?')){data.properties=data.properties.filter(p=>p.id!==id);save()}}
+function addValuation(id){const p=data.properties.find(x=>x.id===id);const value=prompt('New valuation (A$)',p.currentValue);if(value===null)return;const date=prompt('Valuation date (YYYY-MM-DD)',today());if(!date)return;p.currentValue=+value;p.valuationDate=date;p.valuations=p.valuations||[];p.valuations.push({date,value:+value});p.valuations.sort((a,b)=>a.date.localeCompare(b.date));save()}
+function expenseDetailTable(p){const ex=p.expenses||[];if(!ex.length)return '<div class="note">No detailed expenses recorded yet.</div>';const rows=ex.map(e=>`<tr><td>${esc(e.category)}</td><td>${money(e.amount)}</td><td>${esc(e.frequency)}</td><td>${e.type==='capex'?'Capex':'Operating'}</td><td>${money(annualiseExpense(e))}</td></tr>`).join('');return `<table class="history"><thead><tr><th>Expense</th><th>Amount</th><th>Frequency</th><th>Type</th><th>Annualised</th></tr></thead><tbody>${rows}</tbody></table>`}
+function showDetail(id){const p=data.properties.find(x=>x.id===id),c=calc(p),s=score(p,c),[lab]=labelForScore(s);$('detailTitle').textContent=p.name;const rows=(p.valuations||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)).map(v=>`<tr><td>${v.date}</td><td>${money(v.value)}</td></tr>`).join('');$('detailBody').innerHTML=`<div class="cards" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><div class="k">Investment score</div><div class="v">${s}/100</div><div class="s">${lab}</div></div><div class="stat"><div class="k">Return on current equity</div><div class="v">${pct(c.roe)}</div><div class="s">Includes annualised growth</div></div><div class="stat"><div class="k">Cash-on-cash return</div><div class="v">${pct(c.coc)}</div><div class="s">Net cash flow vs initial cash equity</div></div></div><div class="grid"><div class="metric"><div class="k">Annual rent</div><div class="v">${money(c.rent)}</div></div><div class="metric"><div class="k">Annual interest</div><div class="v">${money(c.interest)}</div></div><div class="metric"><div class="k">Operating expenses</div><div class="v">${money(c.expenses)}</div></div><div class="metric"><div class="k">Capital expenditure</div><div class="v">${money(c.capex)}</div></div><div class="metric"><div class="k">Cash after capex</div><div class="v">${money(c.afterCapex)}</div></div><div class="metric"><div class="k">Annualised capital growth</div><div class="v">${pct(c.growth)}</div></div><div class="metric"><div class="k">Gross yield</div><div class="v">${pct(c.grossYield)}</div></div><div class="metric"><div class="k">Net yield before interest</div><div class="v">${pct(c.netYield)}</div></div></div><h4>Expense schedule</h4>${expenseDetailTable(p)}<h4>Valuation history</h4><table class="history"><thead><tr><th>Date</th><th>Valuation</th></tr></thead><tbody>${rows||'<tr><td colspan="2">No history yet.</td></tr>'}</tbody></table>`;detailDialog.showModal()}
+function scenario(id){const p=data.properties.find(x=>x.id===id);$('scenarioId').value=id;$('scValue').value=p.currentValue;$('scRent').value=p.weeklyRent;$('scRate').value=p.interestRate;$('scExpenses').value=annualOperating(p);updateScenario();scenarioDialog.showModal()}
+function updateScenario(){const p=data.properties.find(x=>x.id===$('scenarioId').value);if(!p)return;const c=calc(p,{currentValue:+$('scValue').value,weeklyRent:+$('scRent').value,interestRate:+$('scRate').value,annualExpenses:+$('scExpenses').value});$('scenarioResult').innerHTML=`<div>Equity<b>${money(c.equity)}</b></div><div>Net cash flow<b>${money(c.net)}</b></div><div>ROE<b>${pct(c.roe)}</b></div><div>LVR<b>${pct(c.lvr)}</b></div><div>Net yield<b>${pct(c.netYield)}</b></div><div>Usable equity<b>${money(c.usable)}</b></div>`}
+['scValue','scRent','scRate','scExpenses'].forEach(id=>$(id).addEventListener('input',updateScenario));
+$('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`property-roi-backup-${today()}.json`;a.click();URL.revokeObjectURL(a.href)};
+$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const incoming=JSON.parse(await f.text());if(!Array.isArray(incoming.properties))throw new Error();if(confirm('Replace current local data with this backup?')){data=incoming;save()}}catch{alert('That file is not a valid Property ROI Tracker backup.')}e.target.value=''};
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./service-worker.js');
+render();
+</script>
+</body>
+</html>

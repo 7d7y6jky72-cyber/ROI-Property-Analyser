@@ -1,0 +1,9 @@
+{
+  "name": "Property ROI Tracker",
+  "short_name": "Property ROI",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#0f172a",
+  "description": "Local-first property valuation, equity, cash-flow and ROI tracker."
+}
